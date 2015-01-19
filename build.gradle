@@ -1,0 +1,52 @@
+buildscript {
+  repositories {
+    jcenter()
+    maven { url 'https://oss.jfrog.org/artifactory/repo' }
+  }
+  dependencies {
+    classpath 'io.ratpack:ratpack-gradle:0.9.11'
+  }
+}
+
+if (!JavaVersion.current().java8Compatible) {
+  throw new IllegalStateException("Must be built with Java 8 or higher")
+}
+
+apply plugin: "io.ratpack.ratpack-groovy"
+apply plugin: "idea"
+
+repositories {
+  jcenter()
+  maven { url 'https://oss.jfrog.org/artifactory/repo' }
+}
+
+dependencies {
+  springloaded "org.springframework:springloaded:1.2.1.RELEASE"
+
+  compile ratpack.dependency("guice")
+  compile ratpack.dependency("jackson")
+  compile ratpack.dependency("rx")
+  compile ratpack.dependency("hystrix")
+  compile ratpack.dependency("hikari")
+  compile ratpack.dependency("h2")
+
+  testCompile "org.spockframework:spock-core:0.7-groovy-2.0"
+
+  runtime 'org.apache.logging.log4j:log4j-slf4j-impl:2.0.1'
+  runtime 'org.apache.logging.log4j:log4j-api:2.0.1'
+  runtime 'org.apache.logging.log4j:log4j-core:2.0.1'
+  runtime "mysql:mysql-connector-java:5.1.24"
+}
+
+idea {
+  project {
+    jdkName "1.8"
+    languageLevel "1.8"
+    ipr {
+      withXml { provider ->
+        def node = provider.asNode()
+        node.component.find { it.'@name' == 'VcsDirectoryMappings' }?.mapping[0].'@vcs' = 'Git'
+      }
+    }
+  }
+}
