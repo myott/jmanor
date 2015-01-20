@@ -32,39 +32,43 @@ class BasicTestSpec extends Specification {
   }
 
   def "Test push notification on queue and test size"() {
+    given:
+    def jsonPayload = """{
+  "profile" : 456,
+  "name" : "study_invite",
+  "value" : "post_id:123",
+  "context" : "push_notification_service",
+  "tags" : [
+    {
+      "name" : "new_study_invite_test",
+      "value" : "_"
+    },
+    {
+      "name" : "respondent_service",
+      "value" : "paradigm"
+    }
+  ]
+}"""
+
+    def jsonPayload2 = """{
+"sub": [
+ {
+   "name"  : "id",
+   "value" : "456"
+ }
+]
+}"""
     when:
     requestSpec {
       it.headers.add("Content-Type", APPLICATION_JSON)
-      it.body.stream { it << "{\n" +
-          "  \"profile\" : 456,\n" +
-          "  \"name\" : \"study_invite\",\n" +
-          "  \"value\" : \"post_id:123\",\n" +
-          "  \"context\" : \"push_notification_service\",\n" +
-          "  \"tags\" : [\n" +
-          "    {\n" +
-          "      \"name\" : \"new_study_invite_test\",\n" +
-          "      \"value\" : \"_\"\n" +
-          "    },\n" +
-          "    {\n" +
-          "      \"name\" : \"respondent_service\",\n" +
-          "      \"value\" : \"paradigm\"\n" +
-          "    }\n" +
-          "  ]\n" +
-          "}" }
+      it.body.stream { it << jsonPayload }
     }
     post "push"
 
     then:
     requestSpec {
       it.headers.add("Content-Type", APPLICATION_JSON)
-      it.body.stream { it << "{\n" +
-          "    \"sub\": [\n" +
-          "        {\n" +
-          "          \"name\" : \"id\",\n" +
-          "          \"value\" : \"456\"\n" +
-          "        }\n" +
-          "    ]  \n" +
-          "  }" }
+      it.body.stream { it << jsonPayload2 }
     }
     post "poll"
 
